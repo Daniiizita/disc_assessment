@@ -33,7 +33,8 @@ GENERO_CHOICES = [
 class CustomUser(AbstractUser): # Herda de AbstractUser #cadastra usuario
     
     # Chave estrangeira para o resultado do teste DISC
-    resultado_disc = models.OneToOneField(ResultadoDISC, on_delete=models.SET_NULL, null=True, blank=True)
+    resultado_disc = models.OneToOneField(ResultadoDISC, on_delete=models.SET_NULL, null=True, blank=True, related_name='user')
+
 
 
     # Campo de relação muitos-para-muitos com o modelo Group
