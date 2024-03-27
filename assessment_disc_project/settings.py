@@ -11,12 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 SITED_ID = 1 #para o allauth
 
-
+# Definindo o caminho para o diretório static
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -27,7 +29,9 @@ SECRET_KEY = 'django-insecure-^%p*&5-9g4a63fm!!v5(kpwu%v&hepxp+a**=@#9&v1^s!+(!5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.7', '127.0.0.1', '172.20.10.5', '192.168.1.5', '192.168.1.2', '192.168.1.6', 'localhost']
+#ALLOWED_HOSTS = ['192.168.1.7', '127.0.0.1', '172.20.10.5', '192.168.1.5', '192.168.1.2', '192.168.1.6', 'localhost', *]
+ALLOWED_HOSTS = ['*']
+
 #ALLOWED_HOSTS = []
 
 
