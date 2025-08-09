@@ -10,25 +10,47 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+# --- Segurança (habilitar em produção atrás de proxy/https) ---
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+
 from pathlib import Path
+import os
+from decouple import config, Csv
+import dotenv
+
+dotenv.load_dotenv()
+
+SITE_ID = 1  # (corrige SITED_ID)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-SITED_ID = 1 #para o allauth
-
-
+SITE_ID = 1 #para o allauth
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^%p*&5-9g4a63fm!!v5(kpwu%v&hepxp+a**=@#9&v1^s!+(!5'
+SECRET_KEY = config('SECRET_KEY', default='dev-insecure-key')  # use var de ambiente em prod
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Hosts permitidos (lista via env ou defaults úteis para Docker/WSL)
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,0.0.0.0',
+    cast=Csv()
+)
 
-ALLOWED_HOSTS = ['192.168.1.7', '127.0.0.1', '172.20.10.5', '192.168.1.5', '192.168.1.2', '192.168.1.6', 'localhost']
-#ALLOWED_HOSTS = []
+# Origem confiável para CSRF (necessário quando acessa via IP/porta no Docker)
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:8000,http://127.0.0.1:8000,http://0.0.0.0:8000',
+    cast=Csv()
+)
 
 
 # Application definition
@@ -40,20 +62,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #crispy forms para deixar o form mais bonito
+
+    'django.contrib.sites',  # <-- necessário para allauth
     'crispy_forms',
-    
-    #allauth para autenticação
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    #fim allauth, pode no futuro inserir outras formas de login, so oljar a documentação do allauth
+
     'disc',
     'core',
     'user_auth',
-    
-    #widgets_tweaks para deixar o form mais bonito
-    'widget_tweaks'
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +93,7 @@ ROOT_URLCONF = 'assessment_disc_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates','templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,12 +112,24 @@ WSGI_APPLICATION = 'assessment_disc_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Banco de dados: usa DATABASE_URL (Docker/prod) ou SQLite (dev)
+# Exemplos de DATABASE_URL:
+# - MySQL: mysql://user:password@db:3306/disc_assessment
+# - Postgres: postgres://user:password@db:5432/disc_assessment
+if config('DATABASE_URL', default=None):
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(config('DATABASE_URL'))
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
 """
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend', # padrão
@@ -152,15 +184,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
-""" 
-caminho static pasta caso haja uma pasta static centralizada
+# Adicione esta linha para definir onde os arquivos estáticos serão coletados
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Se você tem arquivos estáticos no seu projeto, adicione também:
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    os.path.join(BASE_DIR, 'static'),
 ]
-""" 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
