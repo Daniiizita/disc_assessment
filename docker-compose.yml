@@ -1,0 +1,29 @@
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=mysql://discuser:discpassword@db:3306/disc_assessment
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: disc_assessment
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: discuser
+      MYSQL_PASSWORD: discpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
