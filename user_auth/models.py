@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from disc.models import ResultadoDISC
 
-
-
 #Dicionarios de NIVEIS DE EDUCACAO e GENERO e STATUS EDUCACAO
 
 NIVEL_EDUCACAO_CHOICES = [

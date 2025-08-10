@@ -1,4 +1,3 @@
-
 services:
   web:
     build: .
@@ -6,12 +5,18 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
     env_file:
       - .env
     environment:
+      - DEBUG=1
       - DATABASE_URL=mysql://discuser:discpassword@db:3306/disc_assessment
     depends_on:
       - db
+    command: >
+      sh -c "python manage.py collectstatic --noinput --clear &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
 
   db:
     image: mysql:8.0
@@ -21,9 +26,10 @@ services:
       MYSQL_USER: discuser
       MYSQL_PASSWORD: discpassword
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
 volumes:
   mysql_data:
+  static_volume:

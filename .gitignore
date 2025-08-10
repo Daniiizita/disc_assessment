@@ -1,9 +1,16 @@
 .venv
+# Environment files
+.env
+*.env
+!.env.example
+
+# Database
 db.sqlite3
+*.db
+
 *.pyc
 __pycache__/
 *.pyo
 *.pyd
-*.db
 *.log
 *.sqlite3

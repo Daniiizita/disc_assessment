@@ -19,7 +19,6 @@ Utilizamos o modelo DISC, uma metodologia consagrada, para oferecer uma análise
 
 Desenvolvida com a framework Django, esta plataforma une um back-end robusto a uma interface amigável, promovendo uma experiência de usuário fluida e enriquecedora.
 
-
 ### Contribuições e Suporte
 
 Seu feedback e contribuições são valiosos. Para dúvidas, suporte ou sugestões, por favor, entre em contato através do email <goncalvesdani54@gmail.com>.
@@ -62,21 +61,56 @@ Seu feedback e contribuições são valiosos. Para dúvidas, suporte ou sugestõ
 
 - **Gerenciamento de Dados Flexível**: No desenvolvimento, optamos pelo SQLite devido à sua simplicidade e eficiência, facilitando os testes e iterações rápidas. Para o ambiente de produção, migramos para o MySQL, aproveitando sua robustez e capacidade de lidar com um volume maior de dados e tráfego de usuários, garantindo desempenho e estabilidade para a plataforma.
 
-## Como Rodar o Projeto
+## Como Rodar em Qualquer Máquina
 
-Siga estes passos para configurar e executar o projeto em seu ambiente local:
+### Opção 1: Docker (Padrão Profissional, recomendado)
 
-1. **Clone o Repositório**:
-   - Use o comando `git clone https://github.com/Daniiizita/disc_assessment` para clonar o repositório no seu sistema.
+```bash
+# Clone o repositório
+git clone https://github.com/Daniiizita/disc_assessment
+cd disc_assessment
 
-2. **Instale as Dependências**:
-   - Navegue até a pasta do repositório clonado e execute `pip install -r requirements.txt` para instalar todas as dependências necessárias.
+# Copie o arquivo de ambiente
+cp .env.example .env
 
-3. **Execute as Migrações**:
-   - Inicie as migrações do banco de dados com `python manage.py migrate` para estruturar o banco de dados.
+# Execute com Docker
+docker-compose up --build
+```
 
-4. **Inicie o Servidor Local**:
-   - Finalmente, execute `python manage.py runserver` para iniciar o servidor local. Após isso, acesse `http://localhost:8000` no seu navegador para visualizar o projeto.
+> Obs.: Certifique-se de que o Docker e o Docker Compose estejam instalados e em execução em sua máquina. Caso não saiba como instalar o Docker, consulte a [documentação oficial do Docker](https://docs.docker.com/get-docker/).
+
+### Opção 2: Instalação Local (mais simples, menos recomendada)
+
+```bash
+# Clone e configure
+git clone https://github.com/Daniiizita/disc_assessment
+cd disc_assessment
+
+# Crie ambiente virtual
+python -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+
+# Instale dependências
+pip install -r requirements.txt
+
+# Configure ambiente
+cp .env.example .env
+
+# Execute migrações
+python manage.py migrate
+
+# Colete arquivos estáticos
+python manage.py collectstatic --noinput
+
+# Execute o servidor
+python manage.py runserver
+```
+
+## Requisitos Mínimos
+
+- Python 3.11+
+- Docker (opcional, mas recomendado)
+- Git
 
 ## Contribuições e Desenvolvimento Futuro
 

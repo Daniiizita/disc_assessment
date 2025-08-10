@@ -184,15 +184,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+# Configurações de arquivos estáticos
 STATIC_URL = '/static/'
 
-# Adicione esta linha para definir onde os arquivos estáticos serão coletados
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Se você tem arquivos estáticos no seu projeto, adicione também:
+# Diretórios onde o Django procura arquivos estáticos durante desenvolvimento
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / 'static',
+    BASE_DIR / 'core' / 'static',
 ]
+
+# Diretório onde collectstatic coleta todos os arquivos estáticos
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Configurações de mídia
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuração para servir arquivos estáticos em desenvolvimento
+DEBUG = True  # ou leia de variável de ambiente
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
