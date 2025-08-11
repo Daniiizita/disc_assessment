@@ -61,7 +61,7 @@ Seu feedback e contribuições são valiosos. Para dúvidas, suporte ou sugestõ
 
 - **Gerenciamento de Dados Flexível**: No desenvolvimento, optamos pelo SQLite devido à sua simplicidade e eficiência, facilitando os testes e iterações rápidas. Para o ambiente de produção, migramos para o MySQL, aproveitando sua robustez e capacidade de lidar com um volume maior de dados e tráfego de usuários, garantindo desempenho e estabilidade para a plataforma.
 
-## Como Rodar em Qualquer Máquina
+## Como rodar o projeto
 
 ### Opção 1: Docker (Padrão Profissional, recomendado)
 
@@ -77,7 +77,10 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-> Obs.: Certifique-se de que o Docker e o Docker Compose estejam instalados e em execução em sua máquina. Caso não saiba como instalar o Docker, consulte a [documentação oficial do Docker](https://docs.docker.com/get-docker/).
+> Obs.: Certifique-se de que o Docker e o Docker Compose estejam instalados e em execução em sua máquina e que você tenha uma SECRET_KEY do Django para rodar o projeto (olhar seção 'Como Executar' mais abaixo).
+
+Docker:
+> Caso não saiba como instalar o Docker, consulte a Documentação Oficial do Docker [clicando aqui](https://docs.docker.com/get-docker/)
 
 ### Opção 2: Instalação Local (mais simples, menos recomendada)
 
@@ -105,6 +108,14 @@ python manage.py collectstatic --noinput
 # Execute o servidor
 python manage.py runserver
 ```
+
+## Como executar
+
+1. Clone o repositório
+2. Copie o arquivo de exemplo: `cp .env.example .env`
+3. Gere uma SECRET_KEY: `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
+4. Cole a SECRET_KEY no arquivo `.env`
+5. Execute (caso esteja usando Docker): `docker-compose up` ou sem Docker: `python manage.py runserver`
 
 ## Requisitos Mínimos
 
