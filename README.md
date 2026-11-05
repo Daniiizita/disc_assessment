@@ -1,97 +1,88 @@
-# Assessment de Perfis Comportamentais DISC - Plataforma Web
+# DISCover: DISC Behavioral Assessment Platform
 
-## Descrição do Projeto
+A Django web application that lets users take a DISC behavioral-style questionnaire, see their dominant profile with a description and suggested work environments, and compare it against the profile distribution of other registered users. Built as a capstone project (TCC) for an Information Systems degree, with first-job interns in mind.
 
-### Avaliação Comportamental Inovadora com DISC
+> The interface is in Brazilian Portuguese.
 
-**Bem-vindo à avaliação comportamental:** uma plataforma web desenvolvida em Django, dedicada a explorar os perfis comportamentais usando o modelo DISC. Este projeto, originado como parte do Trabalho de Conclusão de Curso em Sistemas de Informação, é uma ferramenta inovadora que visa transformar o entendimento e a utilização do potencial humano em ambientes profissionais e pessoais.
+## Tech stack
 
-#### Por que o Modelo DISC?
+| Area | Technology |
+| --- | --- |
+| Backend | Python, Django 4.2 |
+| Authentication | `django-allauth` with a custom user model (`user_auth.CustomUser`) |
+| Forms | `django-crispy-forms`, `django-widget-tweaks` |
+| Frontend | Django templates, HTML, CSS, JavaScript, Bootstrap 5 and Bootstrap Icons (CDN) |
+| Charts | Chart.js (CDN) |
+| Database | SQLite (configured in `settings.py`) |
 
-Utilizamos o modelo DISC, uma metodologia consagrada, para oferecer uma análise precisa dos estilos comportamentais. A plataforma, intuitiva e acessível, torna-se uma ferramenta essencial para o desenvolvimento pessoal e profissional, com aplicação direta em contextos organizacionais.
+<!-- TODO: confirmar — o README original dizia que a produção usa MySQL e `mysqlclient` está no requirements.txt, mas o settings.py só configura SQLite. Confirmar se MySQL foi usado em produção e, se sim, documentar a configuração. -->
 
-#### Benefícios e Aplicação Prática
+## Key features
 
-- **Autoconhecimento para Profissionais**: Ideal para estagiários e recém-ingressos no mercado, a plataforma facilita a identificação de pontos fortes e áreas de melhoria, otimizando a aplicação do estilo comportamental no trabalho.
-- **Recurso para Organizações**: Uma ferramenta valiosa para empresas e RH, melhorando a compreensão das dinâmicas de equipe e auxiliando na alocação de talentos.
+- **Sign-up and login** with `django-allauth`, extended with profile fields: phone, occupation, education level and status, gender, date of birth, location and sector. E-mail verification is disabled.
+- **DISC questionnaire** using a 5-point Likert scale (strongly disagree to strongly agree). Questions are randomly shuffled on every load. The committed database ships with 20 questions, 5 per profile (Dominant, Influential, Steady, Conscientious).
+- **Scoring**: the answers for each profile are averaged, the result is stored, and the highest average determines the user's main profile.
+- **Results page** with the main profile, a description, and suggested work environments for that profile. Signed-in users keep their latest result on a personal profile page.
+- **Profile pages** describing each of the four DISC styles.
+- **Live distribution chart** on the home page: a Chart.js bar chart that polls a JSON endpoint (`/disc/estatisticas/`) every 15 seconds and shows how many registered users fall into each profile.
+- **Django admin** to manage the question bank.
+- **Static pages**: home, about and contact.
 
-### Tecnologia e Inovação
+## Getting started
 
-Desenvolvida com a framework Django, esta plataforma une um back-end robusto a uma interface amigável, promovendo uma experiência de usuário fluida e enriquecedora.
+### Prerequisites
 
+- Python 3.10 or newer (the project targets Django 4.2; the setup below was verified on Python 3.13)
 
-### Contribuições e Suporte
+### Installation
 
-Seu feedback e contribuições são valiosos. Para dúvidas, suporte ou sugestões, por favor, entre em contato através do email <goncalvesdani54@gmail.com>.
+```bash
+git clone https://github.com/Daniiizita/disc_assessment
+cd disc_assessment
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-## Funcionalidades
+`requirements.txt` includes `mysqlclient`, which needs the MySQL client development libraries to compile and is **not used** by the default SQLite configuration. If it fails to install, remove that line and run `pip install` again.
 
-### Autenticação de Usuário Avançada e Segura
+### Run
 
-- **Sistema de Cadastro e Login Refinado**: Utilizamos o renomado sistema allauth para a autenticação de usuários, conhecido por sua eficiência e segurança. Aperfeiçoamos ainda mais essa base, adicionando campos personalizados para atender às necessidades específicas de nossos usuários e do ambiente corporativo. Este sistema de cadastro e login não só simplifica o processo de entrada no site, mas também garante uma experiência personalizada desde o primeiro momento.
+```bash
+python manage.py migrate
+python manage.py runserver
+```
 
-- **Segurança de Senhas com o Django**: A segurança dos dados do usuário é nossa prioridade máxima. O Django, a framework em que nossa plataforma é construída, inclui uma funcionalidade robusta de hashing de senhas. Isso assegura que todas as senhas dos usuários sejam armazenadas de forma segura e criptografada, protegendo-as contra acessos não autorizados. Essa abordagem integrada ao Django reforça a segurança e a confiabilidade da nossa plataforma, mantendo a privacidade e integridade dos dados dos usuários em alto nível.
+Then open <http://localhost:8000>. The repository includes a `db.sqlite3` with the 20 questions already loaded; `migrate` applies any pending migrations. To start from an empty database instead, delete `db.sqlite3`, run `migrate`, create an admin with `python manage.py createsuperuser`, and add questions at <http://localhost:8000/admin/> (each question has a text and a DISC profile).
 
-- **Experiência de Usuário Fluida e Confiável**: Nosso foco está em proporcionar uma experiência de usuário que seja ao mesmo tempo segura e fluida. O processo de cadastro e login foi cuidadosamente projetado para ser intuitivo e amigável, facilitando o acesso dos usuários à plataforma sem comprometer a segurança.
+`ALLOWED_HOSTS` in `assessment_disc_project/settings.py` lists `localhost` and `127.0.0.1`; add your own host there if you serve the app from another address.
 
-### Interface do Usuário
+## Technical highlight: a Likert-based DISC scoring model
 
-- **Página Inicial**: Bem-vindo ao nosso portal, onde você pode mergulhar no universo do teste DISC adaptado para o ambiente corporativo, com ênfase em estagiários em seu primeiro emprego. Com um design moderno e intuitivo, oferecemos informações detalhadas sobre o teste DISC e um gráfico em tempo real que classifica os perfis comportamentais dos usuários que fizeram o teste. Descubra como o teste DISC pode ser uma ferramenta fundamental para compreender a si mesmo e os outros em um ambiente de trabalho, e como isso pode beneficiar sua trajetória profissional desde o início.
+Each `Pergunta` (question) belongs to one of the four DISC profiles. When the form is submitted, answers (1 to 5) are grouped by the profile of their question and averaged per profile, so the score stays comparable even if profiles have different numbers of questions. The averages are stored in a `ResultadoDISC` row, and its `perfil_mais_alto` property picks the highest-scoring profile. For signed-in users the result is linked to their `CustomUser` through a one-to-one relation, which is what feeds the distribution chart on the home page.
 
-- **Sobre Nós**: Nesta seção, você tem a oportunidade de nos conhecer melhor e descobrir a paixão que nos impulsionou a criar esta plataforma de avaliação de perfis comportamentais DISC, especialmente adaptada para estagiários em seu primeiro emprego. Conheça os desenvolvedores por trás do projeto, descubra o que nos motivou a criar esta ferramenta e saiba como ela pode fazer a diferença em sua carreira profissional, ajudando você a dar os primeiros passos com confiança.
+## Project structure
 
-- **Contato**: Estamos aqui para você no início da sua jornada profissional! Utilize o formulário de contato para se conectar diretamente conosco. Fique à vontade para nos enviar mensagens, tirar dúvidas ou compartilhar sugestões relacionadas ao ambiente de trabalho para estagiários. Valorizamos o seu feedback e estamos prontos para ouvir você e ajudar em sua transição para o mundo corporativo.
+```
+assessment_disc_project/   Django settings and root URLs
+core/                      Home, about, contact and DISC profile pages
+disc/                      Questions, questionnaire form, scoring, results, statistics endpoint
+user_auth/                 Custom user model, user profile page
+templates/account/         allauth login, signup and logout templates
+```
 
-- **Teste DISC**: Aqui, a interatividade é a chave para estagiários em seu primeiro emprego! Preencha o formulário com suas respostas no teste DISC e descubra o perfil comportamental que emerge no contexto profissional. Esta é uma ferramenta poderosa, especialmente para estagiários que desejam aprofundar sua compreensão sobre si mesmos e onde melhor se encaixam no ambiente de trabalho durante essa fase crucial de suas carreiras.
+## Roadmap
 
-- **Resultados e Sugestões**: Após a conclusão do teste DISC adaptado para estagiários, você receberá insights valiosos relacionados a áreas de trabalho e sugestões de como se destacar em seu primeiro emprego, com base no seu perfil comportamental. Essas informações podem ser incrivelmente úteis para orientar suas escolhas e garantir um começo de carreira sólido.
+Ideas listed by the author as future work (none of them are implemented yet):
 
-### Avaliação DISC: Uma Jornada de Autoconhecimento e Orientação Profissional
+- Integration with recruitment APIs to suggest job openings based on the user's profile
+- A custom admin dashboard with user-activity reports
+- A comprehensive automated test suite (the project currently has no meaningful tests)
 
-- **Formulário Interativo de Avaliação**: A essência da nossa plataforma é um formulário interativo que guia os usuários através do teste DISC. Com perguntas cuidadosamente elaboradas, este formulário não é apenas uma ferramenta de avaliação, mas também uma experiência introspectiva, incentivando os usuários a refletir sobre suas características e comportamentos.
+## Contact
 
-- **Análise e Ranking de Perfis Comportamentais**: Após o preenchimento do teste, nosso sistema processa as respostas utilizando algoritmos avançados para calcular o perfil comportamental do usuário. Este perfil é então apresentado em um formato compreensível, acompanhado de um ranking que destaca as características predominantes do usuário, oferecendo uma visão clara de sua personalidade no contexto profissional.
+Questions or suggestions: <goncalvesdani54@gmail.com>
 
-- **Recomendações Personalizadas de Carreira**: Um dos diferenciais mais notáveis da nossa plataforma é a capacidade de fornecer sugestões personalizadas de áreas de trabalho e oportunidades profissionais. Com base no perfil comportamental identificado, oferecemos insights sobre ambientes de trabalho ideais e trajetórias profissionais que se alinham melhor às inclinações naturais do usuário. Essas recomendações são uma bússola valiosa para quem busca direcionamento na carreira, especialmente para estagiários e profissionais em início de carreira.
+## License
 
-## Tecnologias Empregadas no Projeto
-
-- **Backend Poderoso com Django e Python**: No coração do nosso sistema está o Django, uma framework de alto desempenho baseada em Python, conhecida por sua escalabilidade e segurança. Combinado com a versatilidade do Python, o Django nos permite criar uma base de backend robusta e eficiente, ideal para lidar com as complexidades da nossa plataforma de avaliação comportamental.
-
-- **Frontend Dinâmico e Responsivo**: Para o frontend, utilizamos uma combinação harmoniosa de HTML, CSS e JavaScript, com a inclusão do Bootstrap para garantir uma interface de usuário responsiva e atraente. Além disso, um toque especial é adicionado com nosso CSS personalizado, que traz uma identidade visual única e uma experiência de usuário mais envolvente e personalizada.
-
-- **Gerenciamento de Dados Flexível**: No desenvolvimento, optamos pelo SQLite devido à sua simplicidade e eficiência, facilitando os testes e iterações rápidas. Para o ambiente de produção, migramos para o MySQL, aproveitando sua robustez e capacidade de lidar com um volume maior de dados e tráfego de usuários, garantindo desempenho e estabilidade para a plataforma.
-
-## Como Rodar o Projeto
-
-Siga estes passos para configurar e executar o projeto em seu ambiente local:
-
-1. **Clone o Repositório**:
-   - Use o comando `git clone https://github.com/Daniiizita/disc_assessment` para clonar o repositório no seu sistema.
-
-2. **Instale as Dependências**:
-   - Navegue até a pasta do repositório clonado e execute `pip install -r requirements.txt` para instalar todas as dependências necessárias.
-
-3. **Execute as Migrações**:
-   - Inicie as migrações do banco de dados com `python manage.py migrate` para estruturar o banco de dados.
-
-4. **Inicie o Servidor Local**:
-   - Finalmente, execute `python manage.py runserver` para iniciar o servidor local. Após isso, acesse `http://localhost:8000` no seu navegador para visualizar o projeto.
-
-## Contribuições e Desenvolvimento Futuro
-
-Este projeto está em constante evolução, e estamos abertos a contribuições que enriqueçam a sua capacidade e alcance. Atualmente, estamos focados em implementar as seguintes melhorias e funcionalidades no futuro:
-
-1. **Integração com APIs de Recrutamento**: Planejamos expandir a funcionalidade da plataforma incorporando APIs de recrutamento. Isso permitirá sugerir vagas de emprego em tempo real, alinhadas com o perfil comportamental do usuário. Tal integração busca oferecer um caminho prático para que os usuários explorem oportunidades de carreira que se alinhem às suas habilidades e preferências.
-
-2. **Dashboard de Administração Personalizado**: Estamos desenvolvendo um dashboard de administração avançado, que proporcionará uma visão abrangente da atividade dos usuários na plataforma. Essa ferramenta não só facilitará o monitoramento do comportamento do usuário, mas também permitirá a geração de relatórios detalhados, auxiliando na análise e melhoria contínua do sistema.
-
-3. **Implementação de Testes Automatizados**: A qualidade do código é fundamental para o sucesso de qualquer projeto. Com isso em mente, pretendemos implementar uma suíte abrangente de testes automatizados. Esses testes garantirão a funcionalidade e a confiabilidade do código, além de facilitar a manutenção e as futuras atualizações do sistema.
-
-## Licença do Projeto
-
-Este projeto é distribuído sob a licença MIT, uma das licenças de software mais permissivas, que oferece grande liberdade para uso privado, comercial, ou de código aberto. A licença MIT é conhecida por sua simplicidade e flexibilidade. Para entender os termos específicos sob os quais o projeto é disponibilizado, por favor, consulte o arquivo [LICENSE.md](LICENSE) incluído no repositório.
-
-## Entre em Contato
-
-Se você tiver perguntas, sugestões, ou estiver interessado em colaborar com o projeto, não hesite em entrar em contato. Estou sempre aberta a feedback e oportunidades de colaboração para melhorar e expandir este projeto. Você pode me alcançar diretamente no seguinte endereço de email: <goncalvesdani54@gmail.com>.
+Distributed under the MIT License. See [LICENSE](LICENSE).
