@@ -53,7 +53,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Then open <http://localhost:8000>. The repository includes a `db.sqlite3` with the 20 questions already loaded; `migrate` applies any pending migrations. To start from an empty database instead, delete `db.sqlite3`, run `migrate`, create an admin with `python manage.py createsuperuser`, and add questions at <http://localhost:8000/admin/> (each question has a text and a DISC profile).
+Then open <http://localhost:8000>. The repository includes a `db.sqlite3` with the 20 questions already loaded and 12 fictional demo users (`usuario_teste_01` to `usuario_teste_12`, all with the test password `senha-de-teste-123`, e-mails at `example.com`). It contains no real personal data and is meant for local development only; `migrate` applies any pending migrations. To start from an empty database instead, delete `db.sqlite3`, run `migrate`, create an admin with `python manage.py createsuperuser`, and add questions at <http://localhost:8000/admin/> (each question has a text and a DISC profile).
 
 `ALLOWED_HOSTS` in `assessment_disc_project/settings.py` lists `localhost` and `127.0.0.1`; add your own host there if you serve the app from another address.
 
