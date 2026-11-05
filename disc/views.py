@@ -49,14 +49,14 @@ class QuestionnaireView(FormView): #antigo PerguntaView
                 conformado=medias['c']
             )
             resultado.save()
-            
-        # Associa o resultado DISC ao usuário se ele estiver logado
+
+            # Associa o resultado DISC ao usuário se ele estiver logado
             if self.request.user.is_authenticated:
                 self.request.user.resultado_disc = resultado
                 self.request.user.save()
 
-            # Redirecionando para a página de resultados com o ID do resultado
-                self.success_url = reverse_lazy('disc:resultado', kwargs={'pk': resultado.id})
+            # Redireciona para a página de resultados (logado ou anônimo)
+            self.success_url = reverse_lazy('disc:resultado', kwargs={'pk': resultado.id})
 
             return super(QuestionnaireView, self).form_valid(form)
 

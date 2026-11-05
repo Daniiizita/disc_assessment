@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,12 +23,14 @@ SITED_ID = 1 #para o allauth
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^%p*&5-9g4a63fm!!v5(kpwu%v&hepxp+a**=@#9&v1^s!+(!5'
+# Production: set SECRET_KEY (and DEBUG=false) in the environment.
+# The fallback key is for local development only and is public in the repo history.
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-only-insecure-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'true').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = ['192.168.1.7', '127.0.0.1', '172.20.10.5', '192.168.1.5', '192.168.1.2', '192.168.1.6', 'localhost']
+ALLOWED_HOSTS = ['192.168.1.7', '127.0.0.1', '172.20.10.5', '192.168.1.5', '192.168.1.2', '192.168.1.6', 'localhost'] + [h for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h]
 #ALLOWED_HOSTS = []
 
 
