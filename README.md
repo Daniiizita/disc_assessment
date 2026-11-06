@@ -55,7 +55,25 @@ python manage.py runserver
 
 Then open <http://localhost:8000>. The repository includes a `db.sqlite3` with the 20 questions already loaded; `migrate` applies any pending migrations. To start from an empty database instead, delete `db.sqlite3`, run `migrate`, create an admin with `python manage.py createsuperuser`, and add questions at <http://localhost:8000/admin/> (each question has a text and a DISC profile).
 
-`ALLOWED_HOSTS` in `assessment_disc_project/settings.py` lists `localhost` and `127.0.0.1`; add your own host there if you serve the app from another address.
+`ALLOWED_HOSTS` in `assessment_disc_project/settings.py` lists `localhost` and `127.0.0.1`; to serve the app from another address, set the `ALLOWED_HOSTS` environment variable (comma-separated) or edit the list.
+
+### Configuration
+
+For anything beyond local development, set these environment variables (the defaults are for local use only):
+
+| Variable | Purpose |
+| --- | --- |
+| `SECRET_KEY` | Django secret key. Always set your own in production. |
+| `DEBUG` | `true` (default) or `false`. Use `false` in production. |
+| `ALLOWED_HOSTS` | Extra allowed hosts, comma-separated. |
+
+### Run the tests
+
+```bash
+python manage.py test
+```
+
+The tests cover anonymous questionnaire submission, per-profile score averaging and the results page.
 
 ## Technical highlight: a Likert-based DISC scoring model
 
@@ -77,7 +95,7 @@ Ideas listed by the author as future work (none of them are implemented yet):
 
 - Integration with recruitment APIs to suggest job openings based on the user's profile
 - A custom admin dashboard with user-activity reports
-- A comprehensive automated test suite (the project currently has no meaningful tests)
+- A more comprehensive automated test suite (a small one exists today: see [Run the tests](#run-the-tests))
 
 ## Contact
 
